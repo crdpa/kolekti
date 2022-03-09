@@ -17,6 +17,6 @@ Kolekti displays info about [Musyca's database](https://github.com/crdpa/musyca/
 
 ## TODO
 
-[✓] Show top artists, top songs and top albums
-[ ] Implement start date and end date to retrieve data
-[ ] Design the UI
+- [x] Show top artists, top songs and top albums
+- [ ] Implement start date and end date to retrieve data
+- [ ] Design the UI
