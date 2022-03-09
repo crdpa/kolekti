@@ -23,7 +23,7 @@ func topSongs(database *sql.DB) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Artist | Song | # |\n| --- | --- | --- |\n")
+	table := fmt.Sprintf("| Artist | Song | > |\n| --- | --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &songName, &plays)
 		table += fmt.Sprintf("| %s | %s | %s |\n", artistName, songName, plays)
@@ -41,7 +41,7 @@ func topArtists(database *sql.DB) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Artist | # |\n| --- | --- |\n")
+	table := fmt.Sprintf("| Artist | > |\n| --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &plays)
 		table += fmt.Sprintf("| %s | %s |\n", artistName, plays)
@@ -60,7 +60,7 @@ func topAlbums(database *sql.DB) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Album | Artist | # |\n| --- | --- | --- |\n")
+	table := fmt.Sprintf("| Album | Artist | > |\n| --- | --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&albumName, &artistName, &plays)
 		table += fmt.Sprintf("| %s | %s | %s |\n", albumName, artistName, plays)
@@ -93,8 +93,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	table = topArtists(database)
-	out, err = glamour.Render(table, "dark")
+	// table = topArtists(database)
+
+	r, _ := glamour.NewTermRenderer(
+		glamour.WithAutoStyle(),
+		glamour.WithWordWrap(60),
+	)
+
+	out, err = r.Render(table)
 	fmt.Print(out)
 	database.Close()
+
+	ui()
 }
