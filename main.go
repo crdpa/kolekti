@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/glamour"
 	_ "github.com/mattn/go-sqlite3"
@@ -84,6 +85,20 @@ func topAlbums(database *sql.DB) string {
 	return table
 }
 
+func parseDate(startDate string, endDate string) (string, string) {
+	const layout = "2006-01-02"
+
+	_, err := time.Parse(layout, startDate)
+	if err != nil {
+		startDate = "*"
+	}
+	_, err = time.Parse(layout, endDate)
+	if err != nil {
+		endDate = "*"
+	}
+	return startDate, endDate
+}
+
 func main() {
 	var (
 		dbPath string
@@ -105,7 +120,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	table = topArtists(database)
+	// table = topArtists(database)
 
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
@@ -116,4 +131,7 @@ func main() {
 	fmt.Print(out)
 	database.Close()
 	ui()
+	startDate, endDate = parseDate(startDate, endDate)
+	fmt.Println(startDate)
+	fmt.Println(endDate)
 }
