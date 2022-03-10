@@ -16,8 +16,10 @@ var (
 	albumName  string
 	songName   string
 	plays      string
+	sqlString  string
 )
 
+// cut long names
 func wordWrap(word string) string {
 	if len(word) > 26 {
 		return word[:26] + "…"
@@ -25,8 +27,9 @@ func wordWrap(word string) string {
 	return word
 }
 
-func topSongs(database *sql.DB) string {
-	rows, err := database.Query(`SELECT artists.name, songs.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id WHERE date>=date('2022-01-01') GROUP BY songs.name ORDER BY count DESC`)
+func topSongs(database *sql.DB, dateString string) string {
+	sqlQuery := `SELECT artists.name, songs.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY songs.name ORDER BY count DESC`
+	rows, err := database.Query(sqlQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,8 +48,9 @@ func topSongs(database *sql.DB) string {
 	return table
 }
 
-func topArtists(database *sql.DB) string {
-	rows, err := database.Query(`SELECT artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id WHERE date>=date('2022-01-01') GROUP BY artists.name ORDER BY count DESC`)
+func topArtists(database *sql.DB, dateString string) string {
+	sqlQuery := `SELECT artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY artists.name ORDER BY count DESC`
+	rows, err := database.Query(sqlQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,9 +68,9 @@ func topArtists(database *sql.DB) string {
 	return table
 }
 
-func topAlbums(database *sql.DB) string {
-	rows, err := database.Query(`SELECT albums.name, artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id WHERE date>=date('2022-01-01') GROUP BY albums.id ORDER BY count DESC
-`)
+func topAlbums(database *sql.DB, dateString string) string {
+	sqlQuery := `SELECT albums.name, artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY albums.id ORDER BY count DESC`
+	rows, err := database.Query(sqlQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,6 +89,7 @@ func topAlbums(database *sql.DB) string {
 	return table
 }
 
+// Parse dates. If not a valid date, use '*'.
 func parseDate(startDate string, endDate string) (string, string) {
 	const layout = "2006-01-02"
 
@@ -97,6 +102,24 @@ func parseDate(startDate string, endDate string) (string, string) {
 		endDate = "*"
 	}
 	return startDate, endDate
+}
+
+// convert dates to sql language
+func dateToSql(startDate string, endDate string) string {
+	if startDate == "*" {
+		if endDate == "*" {
+			sqlString = ""
+		} else {
+			sqlString = `WHERE date<=('` + endDate + `')`
+		}
+	} else {
+		if endDate == "*" {
+			sqlString = `WHERE date >=('` + startDate + `')`
+		} else {
+			sqlString = `WHERE date BETWEEN '` + startDate + `' AND '` + endDate + `'`
+		}
+	}
+	return sqlString
 }
 
 func main() {
@@ -120,18 +143,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// table = topArtists(database)
-
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
 		// glamour.WithWordWrap(60),
 	)
 
+	ui()
+	startDate, endDate = parseDate(startDate, endDate)
+	dateString := dateToSql(startDate, endDate)
+	table = topArtists(database, dateString)
 	out, err = r.Render(table)
 	fmt.Print(out)
 	database.Close()
-	ui()
-	startDate, endDate = parseDate(startDate, endDate)
-	fmt.Println(startDate)
-	fmt.Println(endDate)
 }

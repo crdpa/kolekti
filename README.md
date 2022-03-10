@@ -11,12 +11,14 @@
 
 ## ABOUT
 
-### Work in progress! Not usable yet.
-
 Kolekti displays info about [Musyca's database](https://github.com/crdpa/musyca/) in the terminal.
+
+Just type the dates in YYYY-MM-DD format and see the output.
+
+Any other format or text will be discarded. If you type "March" in 'Start Date' and '2022-03-01' in 'End Date', it will retrieve all the data from the beginning to '2022-03-01'.
 
 ## TODO
 
 - [x] Show top artists, top songs and top albums
-- [ ] Implement start date and end date to retrieve data
+- [x] Implement start date and end date to retrieve data
 - [ ] Design the UI
