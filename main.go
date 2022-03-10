@@ -17,6 +17,13 @@ var (
 	plays      string
 )
 
+func wordWrap(word string) string {
+	if len(word) > 26 {
+		return word[:26] + "…"
+	}
+	return word
+}
+
 func topSongs(database *sql.DB) string {
 	rows, err := database.Query(`SELECT artists.name, songs.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id WHERE date>=date('2022-01-01') GROUP BY songs.name ORDER BY count DESC`)
 	if err != nil {
@@ -26,6 +33,8 @@ func topSongs(database *sql.DB) string {
 	table := fmt.Sprintf("| Artist | Song | > |\n| --- | --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &songName, &plays)
+		artistName = wordWrap(artistName)
+		songName = wordWrap(songName)
 		table += fmt.Sprintf("| %s | %s | %s |\n", artistName, songName, plays)
 		if i == 10 {
 			break
@@ -44,6 +53,7 @@ func topArtists(database *sql.DB) string {
 	table := fmt.Sprintf("| Artist | > |\n| --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &plays)
+		artistName = wordWrap(artistName)
 		table += fmt.Sprintf("| %s | %s |\n", artistName, plays)
 		if i == 10 {
 			break
@@ -63,6 +73,8 @@ func topAlbums(database *sql.DB) string {
 	table := fmt.Sprintf("| Album | Artist | > |\n| --- | --- | --- |\n")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&albumName, &artistName, &plays)
+		artistName = wordWrap(artistName)
+		albumName = wordWrap(songName)
 		table += fmt.Sprintf("| %s | %s | %s |\n", albumName, artistName, plays)
 		if i == 10 {
 			break
@@ -93,16 +105,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// table = topArtists(database)
+	table = topArtists(database)
 
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
-		glamour.WithWordWrap(60),
+		// glamour.WithWordWrap(60),
 	)
 
 	out, err = r.Render(table)
 	fmt.Print(out)
 	database.Close()
-
 	ui()
 }

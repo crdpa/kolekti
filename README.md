@@ -2,7 +2,7 @@
   <h1 align="center">KOLEKTI</h1>
 
   <p align="center">
-    Your own music listening database!<br><br>
+    Show your music listening statistics.<br><br>
     <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/crdpa/kolekti?style=for-the-badge">
     <img alt="GitHub stars" src="https://img.shields.io/github/stars/crdpa/kolekti?style=for-the-badge">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/crdpa/kolekti?style=for-the-badge"><br>
