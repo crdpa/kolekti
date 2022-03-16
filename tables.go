@@ -13,17 +13,20 @@ func topSongs(database *sql.DB, dateString string) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Artist | Song | > |\n| --- | --- | --- |\n")
+	colSize = adjustTable(3)
+
+	table := fmt.Sprintf("%-*s %-*s %-s\n", colSize, "Artist", colSize, "Song", ">")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &songName, &plays)
-		artistName = wordWrap(artistName)
-		songName = wordWrap(songName)
-		table += fmt.Sprintf("| %s | %s | %s |\n", artistName, songName, plays)
+		artistName = wordWrap(artistName, colSize)
+		songName = wordWrap(songName, colSize)
+		table += fmt.Sprintf("%*s %-*s %-s\n", colSize, artistName, colSize, songName, plays)
 		if i == 10 {
 			break
 		}
 	}
 	rows.Close()
+	fmt.Println(colSize)
 	return table
 }
 
@@ -34,11 +37,13 @@ func topArtists(database *sql.DB, dateString string) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Artist | > |\n| --- | --- |\n")
+	colSize := adjustTable(2)
+
+	table := fmt.Sprintf("%-*s %-s\n", colSize, "Artist", ">")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&artistName, &plays)
-		artistName = wordWrap(artistName)
-		table += fmt.Sprintf("| %s | %s |\n", artistName, plays)
+		artistName = wordWrap(artistName, colSize)
+		table += fmt.Sprintf("%-*s %-s\n", colSize, artistName, plays)
 		if i == 10 {
 			break
 		}
@@ -54,12 +59,14 @@ func topAlbums(database *sql.DB, dateString string) string {
 		log.Fatal(err)
 	}
 
-	table := fmt.Sprintf("| Album | Artist | > |\n| --- | --- | --- |\n")
+	colSize := adjustTable(3)
+
+	table := fmt.Sprintf("%-*s %-*s %-s\n", colSize, "Album", colSize, "Artist", ">")
 	for i := 1; rows.Next(); i++ {
 		rows.Scan(&albumName, &artistName, &plays)
-		artistName = wordWrap(artistName)
-		albumName = wordWrap(songName)
-		table += fmt.Sprintf("| %s | %s | %s |\n", albumName, artistName, plays)
+		artistName = wordWrap(artistName, colSize)
+		albumName = wordWrap(albumName, colSize)
+		table += fmt.Sprintf("%-*s %-*s %-s\n", colSize, albumName, colSize, artistName, plays)
 		if i == 10 {
 			break
 		}

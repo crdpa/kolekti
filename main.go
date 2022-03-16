@@ -7,21 +7,29 @@ import (
 	"os"
 	"time"
 
-	"github.com/charmbracelet/glamour"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/nathan-fiscaletti/consolesize-go"
 )
 
 var (
-	artistName string
-	albumName  string
-	songName   string
-	plays      string
-	sqlString  string
+	artistName       string
+	albumName        string
+	songName         string
+	plays            string
+	sqlString        string
+	colSize, lastCol int
 )
 
-func wordWrap(word string) string {
-	if len(word) > 26 {
-		return word[:26] + "…"
+func adjustTable(columns int) int {
+	const lastCol = 6
+	cols, _ := consolesize.GetConsoleSize()
+	colSize := (cols - lastCol) / (columns - 1)
+	return colSize
+}
+
+func wordWrap(word string, colSize int) string {
+	if len(word) > colSize {
+		return word[:colSize-1] + "…"
 	}
 	return word
 }
@@ -45,7 +53,6 @@ func main() {
 	var (
 		dbPath string
 		table  string
-		out    string
 	)
 
 	if len(os.Args) > 1 {
@@ -63,16 +70,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r, _ := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		// glamour.WithWordWrap(60),
-	)
-
 	ui()
 	startDate, endDate = parseDate(startDate, endDate)
 	dateString := dateToSql(startDate, endDate)
-	table = topArtists(database, dateString)
-	out, err = r.Render(table)
-	fmt.Print(out)
+	table = topSongs(database, dateString)
+	fmt.Print(table)
 	database.Close()
 }

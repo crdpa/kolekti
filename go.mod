@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/glamour v0.5.0
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/mattn/go-sqlite3 v1.14.11
+	github.com/nathan-fiscaletti/consolesize-go v0.0.0-20220204101620-317176b6684d
 )
 
 require (
