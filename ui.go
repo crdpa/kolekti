@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	startDate           string
-	endDate             string
+	startDate, endDate  string
+	limit               string
 	focusedStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
 	blurredStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 	cursorStyle         = focusedStyle.Copy()
@@ -34,7 +34,7 @@ type model struct {
 
 func initialModel() model {
 	m := model{
-		inputs: make([]textinput.Model, 2),
+		inputs: make([]textinput.Model, 3),
 	}
 
 	var t textinput.Model
@@ -52,6 +52,9 @@ func initialModel() model {
 			t.TextStyle = focusedStyle
 		case 1:
 			t.Placeholder = "End date (" + time.Now().Local().Format("2006-01-02") + ")"
+			t.CharLimit = 10
+		case 2:
+			t.Placeholder = "Limit (10)"
 			t.CharLimit = 10
 		}
 
@@ -123,6 +126,7 @@ func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
 
 	startDate = m.inputs[0].Value()
 	endDate = m.inputs[1].Value()
+	limit = m.inputs[2].Value()
 	return tea.Batch(cmds...)
 }
 
