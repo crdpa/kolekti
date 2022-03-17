@@ -2,9 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/muesli/termenv"
@@ -24,26 +27,33 @@ func main() {
 		dbPath string
 	)
 
-	if len(os.Args) > 1 {
-		dbPath = os.Args[1]
-	} else {
-		dirname, err := os.UserConfigDir()
-		if err != nil {
-			log.Fatal(err)
-		}
-		dbPath = dirname + "/musyca/database.db"
+	dirname, err := os.UserConfigDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbPath = dirname + "/musyca/database.db"
+
+	limitFlag := flag.Int("l", 10, "Number of results to display.")
+	startDateFlag := flag.String("s", "2000-12-30", "Start date")
+	endDateFlag := flag.String("e", time.Now().Local().Format("2006-01-02"), "End date")
+	dbFlag := flag.String("db", dbPath, "Database path")
+	dataFlag := flag.String("data", "songs", "Songs, artists or albums.")
+	flag.Parse()
+
+	d := strings.ToLower(*dataFlag)
+
+	if d != "songs" && d != "artists" && d != "albums" {
+		d = "songs"
 	}
 
-	database, err := sql.Open("sqlite3", dbPath)
+	database, err := sql.Open("sqlite3", *dbFlag)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ui()
-	startDate, endDate = parseDate(startDate, endDate)
+	startDate, endDate := parseDate(*startDateFlag, *endDateFlag)
 	dateString := dateToSql(startDate, endDate)
-	limitInt := checkLimit(limit)
-	table := getData(database, dateString, "songs", limitInt)
+	table := getData(database, dateString, d, *limitFlag)
 	p := termenv.ColorProfile()
 
 	for i := range table {

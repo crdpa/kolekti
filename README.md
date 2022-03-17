@@ -13,17 +13,29 @@
 
 Kolekti displays info about [Musyca's database](https://github.com/crdpa/musyca/) in the terminal.
 
-For now it is just showing the top played songs.
-
 ![Kolekti demo](assets/kolekti_demo.gif)
 
-Just type the dates in YYYY-MM-DD format, type the limit and see the output.
+## USAGE
 
-Any other format or text will be discarded. If you type "March" in 'Start Date' and '2022-03-01' in 'End Date', it will retrieve all the data from the beginning to '2022-03-01'. If you type anything other than numbers in the 'limit' field, it will default to top 10.
+```
+gore -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database"
+
+  -data string
+    Songs, artists or albums. (default "songs")
+  -db string
+    Database path (default "$HOME/.config/musyca/database.db")
+  -s string
+    Start date (default "2000-12-30")
+  -e string
+    End date (default "2022-03-17")
+  -l int
+    Number of results to display. (default 10)
+```
+
+Any other format or text used for the dates will be discarded. If you type "March" in 'Start Date' and '2022-03-01' in 'End Date', it will retrieve all the data from the beginning to '2022-03-01'.
 
 ## TODO
 
 - [x] Show top artists, top songs and top albums
 - [x] Implement start date and end date to retrieve data
 - [x] Implement limit
-- [ ] Redesign the UI
