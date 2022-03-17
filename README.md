@@ -18,7 +18,7 @@ Kolekti displays info about [Musyca's database](https://github.com/crdpa/musyca/
 ## USAGE
 
 ```
-gore -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database"
+kolekti -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database"
 
   -data string
     Songs, artists or albums. (default "songs")
