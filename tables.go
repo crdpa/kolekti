@@ -39,11 +39,11 @@ func parseDate(startDate string, endDate string) (string, string) {
 	return startDate, endDate
 }
 
-func checkLimit(limit string) int {
-	if limitInt, err := strconv.Atoi(limit); err != nil {
-		return 10
+func checkLimit(limit string) string {
+	if _, err := strconv.Atoi(limit); err != nil {
+		return "10"
 	} else {
-		return limitInt
+		return limit
 	}
 }
 
@@ -66,12 +66,12 @@ func dateToSql(startDate string, endDate string) string {
 	return sqlString
 }
 
-func getData(database *sql.DB, dateString string, what string, limit int) []string {
-	table := make([]string, limit+1)
+func getData(database *sql.DB, dateString string, what string) []string {
+	var table []string
 
 	switch what {
 	case "songs":
-		sqlQuery := `SELECT artists.name, songs.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY songs.name ORDER BY count DESC`
+		sqlQuery := `SELECT artists.name, songs.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY songs.name ORDER BY count DESC LIMIT ` + limit
 
 		rows, err := database.Query(sqlQuery)
 		if err != nil {
@@ -80,23 +80,19 @@ func getData(database *sql.DB, dateString string, what string, limit int) []stri
 
 		colSize = adjustTable(3)
 
-		table[0] = fmt.Sprintf("%-*s %-*s %-s", colSize, "Song", colSize, "Artist", ">")
+		table = append(table, fmt.Sprintf("%-*s %-*s %-s", colSize, "Song", colSize, "Artist", ">"))
 
 		for i := 1; rows.Next(); i++ {
 			rows.Scan(&artistName, &songName, &plays)
 			songName = strconv.Itoa(i) + ". " + songName
 			songName = wordWrap(songName, colSize)
 			artistName = wordWrap(artistName, colSize)
-			table[i] = fmt.Sprintf("%-*s %-*s %-s", colSize, songName, colSize, artistName, plays)
-			if i == limit {
-				rows.Close()
-				break
-			}
+			table = append(table, fmt.Sprintf("%-*s %-*s %-s", colSize, songName, colSize, artistName, plays))
 		}
 		rows.Close()
 
 	case "artists":
-		sqlQuery := `SELECT artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY artists.name ORDER BY count DESC`
+		sqlQuery := `SELECT artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY artists.name ORDER BY count DESC LIMIT ` + limit
 
 		rows, err := database.Query(sqlQuery)
 		if err != nil {
@@ -105,22 +101,18 @@ func getData(database *sql.DB, dateString string, what string, limit int) []stri
 
 		colSize = adjustTable(2)
 
-		table[0] = fmt.Sprintf("%-*s %-s", colSize, "Artist", ">")
+		table = append(table, fmt.Sprintf("%-*s %-s", colSize, "Artist", ">"))
 
 		for i := 1; rows.Next(); i++ {
 			rows.Scan(&artistName, &plays)
 			artistName = strconv.Itoa(i) + ". " + artistName
 			artistName = wordWrap(artistName, colSize)
-			table[i] = fmt.Sprintf("%-*s %-s", colSize, artistName, plays)
-			if i == limit {
-				rows.Close()
-				break
-			}
+			table = append(table, fmt.Sprintf("%-*s %-s", colSize, artistName, plays))
 		}
 		rows.Close()
 
 	case "albums":
-		sqlQuery := `SELECT albums.name, artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY albums.id ORDER BY count DESC`
+		sqlQuery := `SELECT albums.name, artists.name, COUNT(*) as count FROM songs LEFT JOIN albums ON songs.album = albums.id LEFT JOIN artists ON albums.artist = artists.id ` + dateString + ` GROUP BY albums.id ORDER BY count DESC LIMIT ` + limit
 
 		rows, err := database.Query(sqlQuery)
 		if err != nil {
@@ -129,17 +121,13 @@ func getData(database *sql.DB, dateString string, what string, limit int) []stri
 
 		colSize := adjustTable(3)
 
-		table[0] = fmt.Sprintf("%-*s %-*s %-s", colSize, "Album", colSize, "Artist", ">")
+		table = append(table, fmt.Sprintf("%-*s %-*s %-s", colSize, "Album", colSize, "Artist", ">"))
 		for i := 1; rows.Next(); i++ {
 			rows.Scan(&albumName, &artistName, &plays)
 			albumName = strconv.Itoa(i) + ". " + albumName
 			albumName = wordWrap(albumName, colSize)
 			artistName = wordWrap(artistName, colSize)
-			table[i] = fmt.Sprintf("%-*s %-*s %-s", colSize, albumName, colSize, artistName, plays)
-			if i == limit {
-				rows.Close()
-				break
-			}
+			table = append(table, fmt.Sprintf("%-*s %-*s %-s", colSize, albumName, colSize, artistName, plays))
 		}
 		rows.Close()
 	}

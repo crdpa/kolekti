@@ -19,6 +19,7 @@ var (
 	songName         string
 	plays            string
 	sqlString        string
+	limit            string
 	colSize, lastCol int
 )
 
@@ -33,7 +34,7 @@ func main() {
 	}
 	dbPath = dirname + "/musyca/database.db"
 
-	limitFlag := flag.Int("l", 10, "Number of results to display.")
+	limitFlag := flag.String("l", "10", "Number of results to display.")
 	startDateFlag := flag.String("s", "2000-12-30", "Start date")
 	endDateFlag := flag.String("e", time.Now().Local().Format("2006-01-02"), "End date")
 	dbFlag := flag.String("db", dbPath, "Database path")
@@ -51,18 +52,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	limit = checkLimit(*limitFlag)
 	startDate, endDate := parseDate(*startDateFlag, *endDateFlag)
 	dateString := dateToSql(startDate, endDate)
-	table := getData(database, dateString, d, *limitFlag)
+	table := getData(database, dateString, d)
 	p := termenv.ColorProfile()
 
+	fmt.Println()
 	for i := range table {
 		s := termenv.String(table[i])
 		if table[i] == "" {
 			break
 		}
 		if i == 0 {
-			fmt.Println(s.Bold().Underline().Foreground(p.Color("2")))
+			fmt.Println(s.Bold().Underline().
+				Foreground(p.Color("2")))
 			continue
 		} else if i%2 == 0 {
 			fmt.Println(s.Faint())
