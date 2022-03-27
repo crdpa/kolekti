@@ -53,8 +53,7 @@ func main() {
 	}
 
 	limit = checkLimit(*limitFlag)
-	startDate, endDate := parseDate(*startDateFlag, *endDateFlag)
-	dateString := dateToSql(startDate, endDate)
+	dateString := dateToSql(*startDateFlag, *endDateFlag)
 	table := getData(database, dateString, d)
 	p := termenv.ColorProfile()
 
