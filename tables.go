@@ -35,6 +35,7 @@ func checkLimit(limit string) string {
 // convert dates to sql language
 func dateToSql(startDate string, endDate string) string {
 	const layout = "2006-01-02"
+	var sqlString string
 
 	_, err := time.Parse(layout, startDate)
 	if err != nil {
@@ -63,8 +64,14 @@ func dateToSql(startDate string, endDate string) string {
 	return sqlString
 }
 
-func getData(database *sql.DB, dateString, what string) []string {
-	var table []string
+func getData(database *sql.DB, dateString, what, limit string) []string {
+	var (
+		artistName string
+		albumName  string
+		songName   string
+		plays      string
+		table      []string
+	)
 
 	switch what {
 	case "songs":

@@ -14,12 +14,6 @@ import (
 )
 
 var (
-	artistName       string
-	albumName        string
-	songName         string
-	plays            string
-	sqlString        string
-	limit            string
 	colSize, lastCol int
 )
 
@@ -52,9 +46,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	limit = checkLimit(*limitFlag)
+	limit := checkLimit(*limitFlag)
 	dateString := dateToSql(*startDateFlag, *endDateFlag)
-	table := getData(database, dateString, d)
+	table := getData(database, dateString, d, limit)
 	p := termenv.ColorProfile()
 
 	fmt.Println()
