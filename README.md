@@ -18,10 +18,10 @@ Kolekti displays info about [Musyca's database](https://github.com/crdpa/musyca/
 ## USAGE
 
 ```
-kolekti -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database"
+kolekti -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database" --export "path to file"
 
   -data string
-    Songs, artists or albums. (default "songs")
+    songs, artists or albums. (default "songs")
   -db string
     Database path (default "$HOME/.config/musyca/database.db")
   -s string
@@ -30,6 +30,8 @@ kolekti -data artists -s 2020-02-01 -e 2022-13-10 -l 15 -db "path to database"
     End date (default "2022-03-17")
   -l int
     Number of results to display. (default 10)
+  -export string
+    File path to export (default none)
 ```
 
 Any other format or text used for the dates will be discarded. If you type "March" in 'Start Date' and '2022-03-01' in 'End Date', it will retrieve all the data from the beginning to '2022-03-01'.
@@ -39,3 +41,4 @@ Any other format or text used for the dates will be discarded. If you type "Marc
 - [x] Show top artists, top songs and top albums
 - [x] Implement start date and end date to retrieve data
 - [x] Implement limit
+- [x] Add option to export data to a file
