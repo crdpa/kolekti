@@ -27,9 +27,9 @@ func wordWrap(word string, colSize int) string {
 func checkLimit(limit string) string {
 	if _, err := strconv.Atoi(limit); err != nil {
 		return "10"
-	} else {
-		return limit
 	}
+
+	return limit
 }
 
 // convert dates to sql language
